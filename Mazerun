@@ -1,0 +1,275 @@
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+ 
+// 2D array dimentions
+#define M 7 
+//rows and columns
+int ROWS=0;
+int COLS=0;
+//temp rows and cols
+int x = 0;
+int y = 0;
+void populate(int maze[M][M]);
+void printArr (int maze[M][M]);
+void mazer(int maze[M][M]);
+int checkneighbor(int x,int y, int maze[M][M]);
+ void printArr (int maze[M][M]);
+ int numbergenerator();
+void senddirections(int r,int maze[M][M]);
+int north(int x, int y, int maze[M][M]);
+int south(int x, int y, int maze[M][M]);
+int east(int x, int y, int maze[M][M]);
+int west(int x, int y, int maze[M][M]);
+int checkx(int x,int y, int maze[M][M]);
+int checkY(int x,int y, int maze[M][M]);
+int catchy(int y, int maze[M][M]);
+
+
+
+//creates the array and calls to populate the array with 0s and print and calls the //function mazer
+int main(void)
+{
+     time_t t;
+  srand((unsigned)time(&t));
+   int maze[M][M];
+  populate(maze);
+  printArr(maze);
+ 
+  mazer(maze);
+  printArr(maze);
+    
+    return 0;
+}
+
+
+
+/// populates the maze with 0s
+void populate(int maze[M][M])
+{
+  for(int i = 0; i < M ; i++)
+  {
+    for(int l = 0; l < M ; l++)
+    {
+        maze[i][l] = 0;
+    }
+  }
+}
+
+// the random number that determines location
+ int numbergenerator()
+{
+  int r=rand() % 4;
+  //printf("random number %d\n",r);
+  return r;
+}
+// uses the random number and assigns x or y by calling the appropriate method //north south east or west
+void senddirections(int r,int maze[M][M])
+{
+
+    if (r==0)
+    {
+       x = north(x, y, maze);
+    }
+
+      
+    else if (r==1)
+    {
+       y = east(x, y, maze);
+    }
+
+      
+    else if (r==2)
+    {
+       x = south(x, y, maze);
+    }
+
+      
+    else if (r==03)
+    {
+      y = west(x, y, maze);
+    }
+  
+}
+
+
+//set the maze start to 1 and calls the directions and random number and determines if the maze is finished or if it needs to start over
+void mazer(int maze[M][M]){
+  maze[0][0] = 1;
+  printf("\n");
+  int count = 0;
+  while(1){
+  int random=numbergenerator();
+  senddirections(random,maze);
+    //sets the index to 1 to make the path
+     maze[x][y] = 1;
+   
+    count++;
+    //m-1 m-1 is the bottom right corner aka the finish line. when it is 1 the maze //is completed. 
+    if (maze[(M-1)][(M-1)] == 1)
+      break;
+    
+      //if the while loop is ran more than 12 times to try and find a path the maze //clears and sets the counter back to zero and set the temp cols and rows(x and y) //back to 0
+    else if(count == 12){
+      populate(maze);
+      maze[0][0] = 1;
+      x = 0, y = 0;
+      count = 0;
+      
+    }
+    
+  }
+}
+
+//set the the index to the north to 1. also calls to check location and calls checkx and check location.
+int north(int x, int y, int maze[M][M]){
+  
+//checks if move is in boarder and if the number neighbor is equal to 1.
+   if ((checkneighbor((x-1),y, maze)) == 1)
+    return x;
+
+  
+    if(x == (0))
+    return x;
+      
+  //assigns index to 1
+  checkx(x,y,maze);
+ 
+  x--;
+  return x;
+
+}
+//set the the index to the south to 1. also calls to check location and calls checkx and check location.
+
+int south(int x, int y, int maze[M][M]){
+  
+     
+  //assigns index to 1
+   checkx(x,y,maze);
+  
+   if (x == (M - 1))
+    return x;
+  
+   //checks if move is in boarder and if the number neighbor is equal to 1.
+   if ((checkneighbor((x+1),y,maze)) == 1)
+    return x;
+  
+ 
+  
+  x++;
+  return x;
+}
+//set the the index to the east to 1. also calls to check location and calls checky, checklocation and catchy
+int east(int x, int y, int maze[M][M]){
+   catchy(y,maze);
+   //checks if move is in boarder and if the number neighbor is equal to 1.
+ if ((checkneighbor(x,(y+1),maze)) == 1)
+    return y;
+  
+  //assigns index to 1
+   checkY(x,y,maze);
+  
+  y++;
+  return y;
+}
+
+//set the the index to the west to 1. also calls to check location and calls checky, checklocation and catchy
+int west(int x, int y, int maze[M][M]){
+   catchy(y,maze);
+  //checks if move is in boarder and if the number neighbor is equal to 1.
+  if ((checkneighbor(x,(y-1),maze)) == 1)
+    return y;
+  
+  //assigns index to 1
+  checkY(x,y,maze);
+
+  y--;
+  return y;
+}
+
+//checks for number neghbors by adding up the total of the indexs to the north south //east and west. the total if valid should be 1.
+int checkneighbor(int x,int y, int maze[M][M])
+{
+ int total = 0;
+  
+  int N_ROWS=ROWS-1;
+  int N_COLS=COLS-1;
+
+  
+//checks each location and keeps a running total
+  if(N_COLS>0) total += maze[N_ROWS][N_COLS-1];
+  if(N_ROWS>0) total += maze[x-1][N_COLS];
+  if(N_ROWS<M-1) total += maze[x+1][N_COLS];
+  if(N_COLS<M-1) total += maze[N_ROWS][N_COLS+1];
+
+  
+    return total;
+  
+}
+//this is where the actual assigment that makes the index change from 0 to 1 for //the locations north and south.
+int checkx(int x,int y, int maze[M][M])
+{
+ switch (x){
+    case 0: 
+      (maze[x-1][y] == 1);
+    return x;
+      break; //north 
+    case 1: 
+      (maze[x+1][y] == 1);
+    return x;
+      break; //south
+        
+  }
+
+
+   
+}
+//this is where the actual assigment that makes the index change from 0 to 1 for the locations east and west.
+int checkY(int x,int y, int maze[M][M])
+{
+ switch (y){
+    case 0: 
+      (maze[x][y+1] == 1);
+    return y;
+      break; //east
+    case 1: 
+      (maze[x][y-1] == 1);
+    return y;
+      break; //west
+        
+  }
+
+ 
+
+
+}
+//checks current status of a index
+int catchy(int y, int maze[M][M])
+{
+   switch (y){
+    case 0: 
+      (y == (COLS - 1));
+    return y;
+      break; //east
+    case 1: 
+      (y == (0));
+    return y;
+      break; //west
+        
+  }
+  return 0;
+}
+//prints maze
+void printArr (int maze[M][M])
+{
+  for(int i = 0; i < M ; i++)
+  {
+    for(int j = 0; j < M ; j++)
+    {
+        printf("%d\t", maze[i][j]);
+    }
+    printf("\n");
+  }
+}
